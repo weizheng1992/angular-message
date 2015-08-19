@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <script src="js/jquery-1.11.0.js"></script>
+    <script src="js/angular1.3/angular.js"></script>
+    <script src="js/angular1.3/angular-messages.js"></script>
+
+</head>
+<body ng-app="test" >
+    <form name="form" ng-controller="FormCtrl" novalidate ng-submit="submit()">
+        <!--<label name="email">email</label>
+        <input type="text" name="email" ng-model="email" required ng-maxlength="20" ng-minlength="5" ensure-unique="email" placeholder="email address" />
+        <div ng-show="form.email.$dirty&&form.email.$invalid">
+            <small ng-show="form.email.$error.required">必填</small>
+            <small ng-show="form.email.$error.minlength">最少5个</small>
+            <small ng-show="form.email.$error.maxlength">最大20</small>
+            <smail ng-show="form.email.$error.unique">没有此用户</smail>
+        </div>-->
+        <label>name</label>
+        <input type="text" name="sname" ng-model="name" required ng-maxlength="15" ng-minlength="5" placeholder="your name" />
+        <div ng-messages="form.sname.$error" ng-if="interacted(form.sname)" ng-messages-include="templates/errors.html">
+
+        </div>
+        <button type="submit">提交</button>
+    </form>
+
+
+    <script>
+        var app = angular.module('test', ['ngMessages']);
+        app.controller('FormCtrl', function ($scope) {
+            $scope.submitted = false;
+            $scope.submit = function () {
+                $scope.submitted = true;
+            };
+            $scope.interacted = function (field) {
+                return $scope.submitted || field.$dirty; //初次 不显示 必填
+            };
+        });
+        app.directive('ensureUnique', function ($http) {
+            return {
+                required: 'ngModel',
+                link: function (scope,ele,attrs,c) {
+                    scope.$watch(attrs.ngModel, function (n) {
+                        if (!n) return;
+                        $http({
+                            url: 'www.baidu.com',
+                            type: 'post',
+                            data: {
+                                field: attrs.ensureUnique,
+                                value:scope.ngModel
+                            }
+                        }).success(function (data) {
+                            c.$setValidity('unique', data.isUnique);
+                        }).error(function (data) {
+                            c.$setValidity('unique',false)
+                        })
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
